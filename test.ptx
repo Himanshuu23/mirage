@@ -1,0 +1,2 @@
+add.f32 %f3, %f1, %f2;
+ld.global.f32 %f1, [%rd1];
