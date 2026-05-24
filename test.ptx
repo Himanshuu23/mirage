@@ -1,2 +1,5 @@
-add.f32 %f3, %f1, %f2;
 ld.global.f32 %f1, [%rd1];
+ld.global.f32 %f2, [%rd2];
+add.f32 %f3, %f1, %f2;
+st.global.f32 [%rd3], %f3;
+ret;

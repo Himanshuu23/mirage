@@ -1,4 +1,32 @@
+# Compiled binaries
 ptx-emu
 ptx-emu.exe
+vector_add_gpu
+vector_add_gpu.exe
+vector_add_1m
+vector_add_1m.exe
+vector_add_cpu
+vector_add_cpu.exe
+
+# Linker artifacts
+*.lib
+*.exp
+*.obj
 *.o
-*.out
+
+# Build dirs
+build/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# yay (whatever that is)
+yay

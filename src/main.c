@@ -1,27 +1,8 @@
-#include "../include/lexer.h"
+#include "../include/parser.h"
+#include "../include/emulator.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-const char* kind_to_str(TokenKind k) {
-    switch(k) {
-        case INSTR_NAME: return "INSTR_NAME";
-        case REG_NAME:   return "REG_NAME";
-        case TYPE:       return "TYPE";
-        case NUMBER:     return "NUMBER";
-        case LABEL:      return "LABEL";
-        case COMMA:      return "COMMA";
-        case SEMICOLON:  return "SEMICOLON";
-        case LBRACKET:   return "LBRACKET";
-        case RBRACKET:   return "RBRACKET";
-        case LPAREN:     return "LPAREN";
-        case RPAREN:     return "RPAREN";
-        case LBRACE:     return "LBRACE";
-        case RBRACE:     return "RBRACE";
-        case NEW_LINE:   return "NEWLINE";
-        case END_OF_FILE: return "EOF";
-        default:         return "UNKNOWN";
-    }
-}
+#include <time.h>
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -43,17 +24,45 @@ int main(int argc, char* argv[]) {
     src[size] = '\0';
     fclose(f);
 
-    Lexer l;
-    l.text             = src;
-    l.current_position = 0;
-    l.line             = 1;
+    Parser p;
+    parser_init(&p, src);
 
+    Instr instrs[256];
+    int count = 0;
     while (1) {
-        Token t = lexer_next(&l);
-        printf("%s: %s\n", kind_to_str(t.kind), t.text);
-        if (t.kind == END_OF_FILE) break;
+        Instr instr = parser_next(&p);
+        instrs[count++] = instr;
+        if (instr.op == RET) break;
+    }
+    
+    Emulator* e = emulator_create(4, 64 * 1024 * 1024);
+   
+    float* a = (float*)e->global_mem;
+    float* b = (float*)(e->global_mem + 16);
+    float* c = (float*)(e->global_mem + 32);
+    for (int i = 0; i < 4; i++) {
+        a[i] = (float)(i + 1);
+        b[i] = (float)((i + 1) * 10);
+    }
+    for (int i = 0; i < 4; i++) {
+        e->threads[i].dregs[1] = i * sizeof(float);      
+        e->threads[i].dregs[2] = 16 + i * sizeof(float);
+        e->threads[i].dregs[3] = 32 + i * sizeof(float);
     }
 
+    clock_t start = clock();
+    emulator_run(e, instrs, count);
+    clock_t end = clock();
+    double ms = (double)(end - start) / CLOCKS_PER_SEC * 1000.0;
+
+    printf("    Emulator Results\n");
+    for (int i = 0; i < 4; i++) {
+        printf("thread %d: a=%.1f  b=%.1f  c=%.1f\n",
+               i, a[i], b[i], c[i]);
+    }
+    printf("Emulator time: %.4fms\n", ms);
+
+    emulator_free(e);
     free(src);
     return 0;
 }
