@@ -26,7 +26,7 @@ int main() {
     float ms = (end.tv_sec - start.tv_sec) * 1000.0f +
                (end.tv_nsec - start.tv_nsec) / 1e6f;
 
-    printf("=== CPU Vector Addition: %d elements ===\n\n", N);
+    printf("    CPU Vector Addition: %d elements \n\n", N);
     printf("CPU time : %.4f ms\n", ms);
     printf("\nSample results (first 4):\n");
     for (int i = 0; i < 4; i++) {

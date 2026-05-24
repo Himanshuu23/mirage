@@ -34,7 +34,7 @@ int main() {
 
     cudaMemcpy(h_c, d_c, n * sizeof(float), cudaMemcpyDeviceToHost);
 
-    printf("=== GPU Results ===\n");
+    printf("    GPU Results \n");
     for (int i = 0; i < n; i++) {
         printf("thread %d: a=%.1f  b=%.1f  c=%.1f\n", i, h_a[i], h_b[i], h_c[i]);
     }
